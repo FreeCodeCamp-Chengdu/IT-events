@@ -2,7 +2,7 @@
 平时看到各种成都的技术活动，就把这个信息统一整理放到 google 日历里，共享出来大家可以随时关注
 
 日历主要通过 Google 日历完成。
-参考  http://devcd.github.io/pages/about.html
+参考  http://devcd.github.io/hxcd-events.html
 本身 google 的日历 embed 是挺好的了，就是需要翻墙，所以现在用一个网上提供的 ical embed， 如果有大佬帮忙优化 css 和 格式等最好了。 
 google 的日历可以共享出来，大家都可以往上面添加和完善活动信息，需要 google 帐号哈。平时有活动也可以直接发给@too，我去整理放上去
 
