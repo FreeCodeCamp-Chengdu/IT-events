@@ -1,0 +1,70 @@
+{
+    "name": "@fcc-cdc/it-events",
+    "version": "0.1.0",
+    "description": "IT events of China",
+    "keywords": [
+        "IT",
+        "event",
+        "activity",
+        "China"
+    ],
+    "license": "MIT",
+    "author": "shiy2008@gmail.com",
+    "homepage": "https://github.com/FreeCodeCamp-Chengdu/IT-events#readme",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/FreeCodeCamp-Chengdu/IT-events.git"
+    },
+    "bugs": {
+        "url": "https://github.com/FreeCodeCamp-Chengdu/IT-events/issues"
+    },
+    "bin": "dist/index.js",
+    "engines": {
+        "node": "^6.13.0"
+    },
+    "scripts": {
+        "format": "prettier --write \"{,!(node_modules|.git|dist|docs)/**/}*.{html,md,css,less,js,json,yml,yaml}\"",
+        "lint": "eslint source/ --fix",
+        "pack": "babel source/ -d dist/ -s",
+        "build": "npm run format  &&  npm run lint  &&  npm run pack"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "npm run build  &&  git add ."
+        }
+    },
+    "dependencies": {
+        "@babel/polyfill": "^7.2.5",
+        "@babel/runtime": "^7.4.3",
+        "jsdom": "^14.0.0",
+        "node-fetch": "^2.3.0"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.4.3",
+        "@babel/core": "^7.4.3",
+        "@babel/plugin-transform-runtime": "^7.4.3",
+        "@babel/preset-env": "^7.3.4",
+        "eslint": "^5.15.0",
+        "husky": "^1.3.1",
+        "prettier": "^1.16.4"
+    },
+    "babel": {
+        "presets": [
+            [
+                "@babel/preset-env",
+                {
+                    "targets": {
+                        "node": "6.13.0"
+                    }
+                }
+            ]
+        ],
+        "plugins": [
+            "@babel/plugin-transform-runtime"
+        ]
+    },
+    "prettier": {
+        "tabWidth": 4,
+        "singleQuote": true
+    }
+}

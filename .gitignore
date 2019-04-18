@@ -1,0 +1,16 @@
+# Node.JS
+node_modules/
+
+# Building
+dist/
+docs/
+
+# IDE
+.vscode/
+.idea/
+
+# Online platform
+.github/
+
+# OS
+.DS_Store

@@ -1,0 +1,44 @@
+{
+    "env": {
+        "es6": true,
+        "node": true,
+        "browser": true,
+        "mocha": true
+    },
+    "parserOptions": {
+        "ecmaVersion": 9,
+        "sourceType": "module"
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+        "indent": [
+            "error",
+            4,
+            {
+                "SwitchCase": 1
+            }
+        ],
+        "linebreak-style": ["error", "unix"],
+        "quotes": ["error", "single"],
+        "semi": ["error", "always"],
+        "no-cond-assign": "off",
+        "getter-return": "warn",
+        "no-console": [
+            "error",
+            {
+                "allow": ["info", "warn", "error", "time", "timeEnd"]
+            }
+        ],
+        "valid-jsdoc": [
+            "error",
+            {
+                "prefer": {
+                    "returns": "return"
+                },
+                "requireParamDescription": false,
+                "requireReturn": false,
+                "requireReturnDescription": false
+            }
+        ]
+    }
+}
