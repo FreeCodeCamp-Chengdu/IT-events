@@ -9,7 +9,7 @@ npm install
 
 npm run build
 
-node dist/ 1> test/index.json
+node dist/ 1> test.yml
 ```
 
 ## 想法

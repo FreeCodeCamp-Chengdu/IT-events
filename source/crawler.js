@@ -8,50 +8,58 @@ import { event_list } from './utility';
 
 export async function* HuoDongXing(start = 1) {
     while (true) {
-        const URL = `https://www.huodongxing.com/events?${new URLSearchParams({
-            orderby: 'n',
-            tag: 'IT互联网',
-            city: '成都',
-            page: start++
-        })}`;
+        let URL = `https://www.huodongxing.com/events?${new URLSearchParams({
+                orderby: 'n',
+                tag: 'IT互联网',
+                city: '成都',
+                page: start++
+            })}`,
+            empty = true;
 
-        const data = await event_list(
+        for await (const item of event_list(
             URL,
             '.search-tab-content-list-check .search-tab-content-item-mesh',
             '.item-title',
             '.date-pp',
             '.item-dress-pp',
-            '.item-logo'
-        );
+            '.item-logo',
+            '.search-tab-content-item-mesh > a'
+        )) {
+            empty = false;
 
-        if ((data || '')[0]) yield { URL, data };
-        else break;
+            yield item;
+        }
+
+        if (empty) break;
     }
 }
 
 export async function* SegmentFault(start = 1) {
     while (true) {
-        const URL = `https://segmentfault.com/events?${new URLSearchParams({
-            city: 510100,
-            page: start++
-        })}`;
+        let URL = `https://segmentfault.com/events?${new URLSearchParams({
+                city: 510100,
+                page: start++
+            })}`,
+            empty = true;
 
-        const data = await event_list(
+        for await (const item of event_list(
             URL,
             '.all-event-list .widget-event',
             '.title',
-            '.widget-event__meta :first-child',
-            '.widget-event__meta :last-child',
-            '.widget-event__banner'
-        );
+            '.widget-event__meta > :first-child',
+            '.widget-event__meta > :last-child',
+            '.widget-event__banner',
+            '.title > a'
+        )) {
+            empty = false;
 
-        data.forEach(item => {
-            (item.date = item.date.slice(3)),
+            (item.start = item.start.slice(3)),
             (item.address = item.address.slice(3));
-        });
 
-        if ((data || '')[0]) yield { URL, data };
-        else break;
+            yield item;
+        }
+
+        if (empty) break;
     }
 }
 
@@ -68,8 +76,30 @@ export async function* JueJin(start = 1) {
 
         const data = (await (await fetch(URL)).json()).d;
 
-        if ((data || '')[0]) yield { URL, data };
-        else break;
+        if (!(data || '')[0]) break;
+
+        console.warn(URL);
+
+        for (const {
+            title,
+            eventUrl,
+            tagInfo,
+            content,
+            startTime,
+            endTime,
+            city,
+            screenshot
+        } of data)
+            yield {
+                title,
+                start: startTime,
+                end: endTime,
+                address: city,
+                tags: tagInfo.map(({ title }) => title),
+                summary: content,
+                link: eventUrl,
+                banner: screenshot
+            };
     }
 }
 
@@ -84,16 +114,20 @@ export async function* BaiGe(start = 1) {
             }
         )}`;
 
-        try {
-            const data = (await (await fetch(URL)).json()).resultObject
-                .valueList.list;
+        const data = (await (await fetch(URL)).json()).resultObject.valueList
+            .list;
 
-            if ((data || '')[0]) yield { URL, data };
-            else break;
-        } catch (error) {
-            console.warn(error.message);
-            break;
-        }
+        if (!(data || '')[0]) break;
+
+        console.warn(URL);
+
+        for (const { event_name, start_time, address, logo } of data)
+            yield {
+                title: event_name,
+                start: start_time,
+                address,
+                banner: 'https://www.bagevent.com' + logo
+            };
     }
 }
 
@@ -107,21 +141,26 @@ export async function* OSChina(start = 1) {
             }),
             URL = 'https://www.oschina.net/action/ajax/get_more_event_list';
 
-        var data = await (await fetch(URL, {
-            method: 'POST',
-            body
-        })).text();
+        let data = await (await fetch(URL, {
+                method: 'POST',
+                body
+            })).text(),
+            empty = true;
 
-        data = await event_list(
+        for await (const item of event_list(
             new JSDOM(data, { url: URL + '?' + body }),
             '.event-item',
             '.summary',
             '.when-where > label:first-of-type',
             '.when-where > label:last-of-type',
-            '.item-banner img'
-        );
+            '.item-banner img',
+            '.item-banner > a'
+        )) {
+            empty = false;
 
-        if ((data || '')[0]) yield { URL, data };
-        else break;
+            yield item;
+        }
+
+        if (empty) break;
     }
 }
