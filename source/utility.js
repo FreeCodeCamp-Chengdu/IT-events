@@ -2,6 +2,17 @@ import { JSDOM } from 'jsdom';
 
 import { URL } from 'url';
 
+export function makeDate(raw) {
+    const date = new Date(
+        ((raw || '') + '')
+            .replace(/\.\d{3}Z/, '')
+            .replace(/[^\d\-T:]+/g, '-')
+            .replace(/^-*|-*$/g, '')
+    );
+
+    if (!isNaN(+date)) return date;
+}
+
 export async function* event_list(
     source,
     box,

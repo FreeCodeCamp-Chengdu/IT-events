@@ -17,8 +17,7 @@ const list = [];
             else
                 new Set(Object.keys(item).concat(event)).forEach(key => {
                     if (['start', 'end'].includes(key)) {
-                        if (isNaN(+new Date(item.start)))
-                            item.start = event.start;
+                        if (item[key] < event[key]) item[key] = event[key];
                     } else if (
                         (item[key] || '').length < (event[key] || '').length
                     )

@@ -4,28 +4,33 @@ import { JSDOM } from 'jsdom';
 
 import fetch from 'node-fetch';
 
-import { event_list } from './utility';
+import { event_list, makeDate } from './utility';
 
-export async function* HuoDongXing(start = 1) {
-    while (true) {
-        let URL = `https://www.huodongxing.com/events?${new URLSearchParams({
+export async function* HuoDongXing(all) {
+    for (let page = 1; ; page++) {
+        let URL = `https://www.huodongxing.com/eventlist?${new URLSearchParams({
                 orderby: 'n',
+                status: all ? '' : 1,
                 tag: 'IT互联网',
                 city: '成都',
-                page: start++
+                page
             })}`,
             empty = true;
 
         for await (const item of event_list(
             URL,
-            '.search-tab-content-list-check .search-tab-content-item-mesh',
+            '.search-tab-content-list .search-tab-content-item',
             '.item-title',
-            '.date-pp',
-            '.item-dress-pp',
+            '.item-data',
+            '.item-dress',
             '.item-logo',
-            '.search-tab-content-item-mesh > a'
+            '.item-title'
         )) {
             empty = false;
+
+            const [start, end] = item.start.split('-');
+
+            (item.start = makeDate(start)), (item.end = makeDate(end));
 
             yield item;
         }
@@ -34,13 +39,14 @@ export async function* HuoDongXing(start = 1) {
     }
 }
 
-export async function* SegmentFault(start = 1) {
-    while (true) {
+export async function* SegmentFault(all) {
+    for (let page = 1; ; page++) {
         let URL = `https://segmentfault.com/events?${new URLSearchParams({
                 city: 510100,
-                page: start++
+                page
             })}`,
-            empty = true;
+            empty = true,
+            now = new Date();
 
         for await (const item of event_list(
             URL,
@@ -53,8 +59,10 @@ export async function* SegmentFault(start = 1) {
         )) {
             empty = false;
 
-            (item.start = item.start.slice(3)),
+            (item.start = makeDate(item.start.slice(3))),
             (item.address = item.address.slice(3));
+
+            if (!all && now > item.start) return;
 
             yield item;
         }
@@ -63,16 +71,17 @@ export async function* SegmentFault(start = 1) {
     }
 }
 
-export async function* JueJin(start = 1) {
-    while (true) {
+export async function* JueJin(all) {
+    for (let pageNum = 1; ; pageNum++) {
         const URL = `https://event-storage-api-ms.juejin.im/v2/getEventList?${new URLSearchParams(
-            {
-                src: 'web',
-                orderType: 'startTime',
-                cityAlias: 'chengdu',
-                pageNum: start++
-            }
-        )}`;
+                {
+                    src: 'web',
+                    orderType: 'startTime',
+                    cityAlias: 'chengdu',
+                    pageNum
+                }
+            )}`,
+            now = new Date();
 
         const data = (await (await fetch(URL)).json()).d;
 
@@ -80,7 +89,7 @@ export async function* JueJin(start = 1) {
 
         console.warn(URL);
 
-        for (const {
+        for (let {
             title,
             eventUrl,
             tagInfo,
@@ -89,7 +98,11 @@ export async function* JueJin(start = 1) {
             endTime,
             city,
             screenshot
-        } of data)
+        } of data) {
+            (startTime = makeDate(startTime)), (endTime = makeDate(endTime));
+
+            if (!all && now > startTime) return;
+
             yield {
                 title,
                 start: startTime,
@@ -100,19 +113,21 @@ export async function* JueJin(start = 1) {
                 link: eventUrl,
                 banner: screenshot
             };
+        }
     }
 }
 
-export async function* BaiGe(start = 1) {
-    while (true) {
+export async function* BaiGe(all) {
+    for (let pagingPage = 1; ; pagingPage++) {
         const URL = `https://www.bagevent.com/load/loadSearchEventList.do?${new URLSearchParams(
-            {
-                orderByNormal: 1,
-                city: '成都',
-                tag: 17,
-                pagingPage: start++
-            }
-        )}`;
+                {
+                    orderByNormal: 1,
+                    city: '成都',
+                    tag: 17,
+                    pagingPage
+                }
+            )}`,
+            now = new Date();
 
         const data = (await (await fetch(URL)).json()).resultObject.valueList
             .list;
@@ -121,25 +136,31 @@ export async function* BaiGe(start = 1) {
 
         console.warn(URL);
 
-        for (const { event_name, start_time, address, logo } of data)
+        for (let { event_name, start_time, address, logo } of data) {
+            start_time = makeDate(start_time);
+
+            if (!all && now > start_time) return;
+
             yield {
                 title: event_name,
                 start: start_time,
                 address,
                 banner: 'https://www.bagevent.com' + logo
             };
+        }
     }
 }
 
-export async function* OSChina(start = 1) {
-    while (true) {
+export async function* OSChina(all) {
+    for (let p = 1; ; p++) {
         const body = new URLSearchParams({
                 tab: 'latest',
                 time: 'all',
                 city: '成都',
-                p: start++
+                p
             }),
-            URL = 'https://www.oschina.net/action/ajax/get_more_event_list';
+            URL = 'https://www.oschina.net/action/ajax/get_more_event_list',
+            now = new Date();
 
         let data = await (await fetch(URL, {
                 method: 'POST',
@@ -157,6 +178,10 @@ export async function* OSChina(start = 1) {
             '.item-banner > a'
         )) {
             empty = false;
+
+            item.start = makeDate(item.start);
+
+            if (!all && now > item.start) return;
 
             yield item;
         }
