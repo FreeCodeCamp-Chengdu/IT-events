@@ -2,6 +2,11 @@ import { JSDOM } from 'jsdom';
 
 import { URL } from 'url';
 
+/**
+ * @param {String} raw
+ *
+ * @return {?Date}
+ */
 export function makeDate(raw) {
     const date = new Date(
         ((raw || '') + '')
@@ -13,6 +18,18 @@ export function makeDate(raw) {
     if (!isNaN(+date)) return date;
 }
 
+/**
+ * @param {String|JSDOM} source - Web URL or document
+ * @param {String}       box     - CSS Selector of Event container
+ * @param {String}       title   - CSS Selector of Event title
+ * @param {String}       start   - CSS Selector of Event start date
+ * @param {String}       address - CSS Selector of Event address
+ * @param {?String}      banner  - CSS Selector of Event banner image
+ * @param {?String}      link    - CSS Selector of Event URL
+ * @param {?String}      tags    - CSS Selector of Event tags
+ *
+ * @yield {Object} Event data
+ */
 export async function* event_list(
     source,
     box,
@@ -20,7 +37,8 @@ export async function* event_list(
     start,
     address,
     banner,
-    link
+    link,
+    tags
 ) {
     const {
         window: { location, document }
@@ -33,27 +51,68 @@ export async function* event_list(
     console.warn(location + '');
 
     for (const item of box) {
-        let image,
-            { dataset, src } = item.querySelector(banner);
+        const data = {
+            title: item.querySelector(title).textContent.trim(),
+            start: item.querySelector(start).textContent.trim(),
+            address: item.querySelector(address).textContent.trim()
+        };
+
+        const { dataset, src } = item.querySelector(banner);
+
+        data.banner = src;
 
         for (const key in dataset)
             if (dataset[key].startsWith('http')) {
-                image = dataset[key];
+                data.banner = dataset[key];
                 break;
             }
 
-        const URI = new URL(item.querySelector(link).href);
+        data.link = new URL(item.querySelector(link).href);
 
-        Array.from(URI.searchParams.keys()).forEach(
-            key => key.startsWith('utm_') && URI.searchParams.delete(key)
+        Array.from(data.link.searchParams.keys()).forEach(
+            key => key.startsWith('utm_') && data.link.searchParams.delete(key)
         );
 
-        yield {
-            title: item.querySelector(title).textContent.trim(),
-            start: item.querySelector(start).textContent.trim(),
-            address: item.querySelector(address).textContent.trim(),
-            banner: image || src,
-            link: URI + ''
-        };
+        if (tags)
+            data.tags = Array.from(item.querySelectorAll(tags), item =>
+                item.textContent.trim()
+            );
+
+        yield data;
+    }
+}
+
+/**
+ * @param {Number} [seconds=0.25]
+ *
+ * @return {Promise}
+ */
+export function delay(seconds = 0.25) {
+    return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+}
+
+/**
+ * @param {Iterator[]}                    list
+ * @param {function(A: *, B: *): Boolean} [sorter] - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#Parameters
+ * @param {?Number}                       interval - Seconds
+ *
+ * @yield {*} Data from `list` of Iterators
+ */
+export async function* mergeStream(list, sorter, interval) {
+    const wait = Array(list.length);
+
+    while (true) {
+        for (let i = 0; i < wait.length; i++)
+            if (wait[i] === undefined) wait[i] = (await list[i].next()).value;
+
+        const top = wait.filter(item => item !== undefined).sort(sorter)[0];
+
+        if (top === undefined) break;
+
+        wait[wait.indexOf(top)] = undefined;
+
+        yield top;
+
+        await delay(interval);
     }
 }

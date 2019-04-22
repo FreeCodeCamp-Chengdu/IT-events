@@ -1,15 +1,31 @@
-# 成都开发者活动日历
+# 中国 IT 活动爬虫
 
-## 最新进展
+核心代码源自[《NodeJS 网页爬虫一小时实战》课程](https://fcc-cd.tk/activity/workshop/nodejs-web-crawler/)
 
-水歌 @TechQuery 用爬虫抓去各个活动网站的信息来更新到 fcc-cd.tk， 详见 [NodeJS 网页爬虫一小时实战 - FCC 成都社区](https://fcc-cd.tk/activity/workshop/nodejs-web-crawler/)
+[![NPM Dependency](https://david-dm.org/FreeCodeCamp-Chengdu/IT-events.svg)](https://david-dm.org/FreeCodeCamp-Chengdu/IT-events)
+
+## 基本用法
+
+### 命令行
 
 ```shell
-npm install
+npm install https://github.com/FreeCodeCamp-Chengdu/IT-events.git -g
 
-npm run build
+it-events 1> ~/Desktop/it-events.yml
+```
 
-node dist/ 1> test.yml
+### Node.JS 模块
+
+```shell
+npm install https://github.com/FreeCodeCamp-Chengdu/IT-events.git
+```
+
+```javascript
+import '@babel/polyfill';
+
+import updateEvents, { descendDate } from '@fcc-cdc/it-events';
+
+updateEvents().then(list => console.info(list.sort(descendDate)));
 ```
 
 ## 想法

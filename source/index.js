@@ -1,29 +1,66 @@
-#! /usr/bin/env node
-
-import '@babel/polyfill';
-
 import * as crawler from './crawler';
 
-import { stringify } from 'yaml';
+import { mergeStream } from './utility';
 
-const list = [];
+import { compareTwoStrings } from 'string-similarity';
 
-(async () => {
-    for (const site in crawler)
-        for await (const event of crawler[site]()) {
-            const item = list.find(({ link }) => link === event.link);
+export * from './utility';
 
-            if (!item) list.push(event);
-            else
-                new Set(Object.keys(item).concat(event)).forEach(key => {
-                    if (['start', 'end'].includes(key)) {
-                        if (item[key] < event[key]) item[key] = event[key];
-                    } else if (
-                        (item[key] || '').length < (event[key] || '').length
-                    )
+export * from './crawler';
+
+/**
+ * @param {Object} A
+ * @param {Object} B
+ *
+ * @return {Number}
+ */
+export function descendDate(A, B) {
+    return B.start - A.start;
+}
+
+/**
+ * @param {Object[]} [store=[]] - Fetched Events
+ * @param {?Number}  interval   - Seconds
+ *
+ * @return {Object[]} Updated Events
+ */
+export default async function(store = [], interval) {
+    store = store.filter(Boolean);
+
+    const updated = [];
+
+    for await (let event of mergeStream(
+        Object.values(crawler).map(item => item()),
+        descendDate,
+        interval
+    )) {
+        const item = store.find(
+            ({ link, title }) =>
+                link === event.link ||
+                compareTwoStrings(title, event.title) > 0.7
+        );
+
+        if (!item) {
+            store.push(event);
+
+            updated.push(event);
+        } else
+            new Set(Object.keys(item).concat(event)).forEach(key => {
+                if (['start', 'end'].includes(key)) {
+                    if (item[key] < event[key]) {
                         item[key] = event[key];
-                });
-        }
 
-    console.info(stringify(list));
-})();
+                        updated.push(item);
+                    }
+                } else if (
+                    (item[key] || '').length < (event[key] || '').length
+                ) {
+                    item[key] = event[key];
+
+                    updated.push(item);
+                }
+            });
+    }
+
+    return Array.from(new Set(updated));
+}
