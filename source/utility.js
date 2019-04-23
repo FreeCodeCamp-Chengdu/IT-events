@@ -10,7 +10,8 @@ import { URL } from 'url';
 export function makeDate(raw) {
     const date = new Date(
         ((raw || '') + '')
-            .replace(/\.\d{3}Z/, '')
+            .replace(/\s+(\d+:)/, 'T$1')
+            .replace(/\.\d{3}Z?/, '')
             .replace(/[^\d\-T:]+/g, '-')
             .replace(/^-*|-*$/g, '')
     );
@@ -19,20 +20,20 @@ export function makeDate(raw) {
 }
 
 /**
- * @param {String|JSDOM} source - Web URL or document
- * @param {String}       box     - CSS Selector of Event container
+ * @param {String|JSDOM} source  - Web URL or document
+ * @param {String}       list    - CSS Selector of Event container
  * @param {String}       title   - CSS Selector of Event title
  * @param {String}       start   - CSS Selector of Event start date
- * @param {String}       address - CSS Selector of Event address
+ * @param {?String}      address - CSS Selector of Event address
  * @param {?String}      banner  - CSS Selector of Event banner image
  * @param {?String}      link    - CSS Selector of Event URL
  * @param {?String}      tags    - CSS Selector of Event tags
  *
  * @yield {Object} Event data
  */
-export async function* event_list(
+export async function* eventList(
     source,
-    box,
+    list,
     title,
     start,
     address,
@@ -44,34 +45,44 @@ export async function* event_list(
         window: { location, document }
     } = typeof source === 'string' ? await JSDOM.fromURL(source) : source;
 
-    box = document.querySelectorAll(box);
+    list = document.querySelectorAll(list);
 
-    if (!box[0]) return;
+    if (!list[0]) return;
 
     console.warn(location + '');
 
-    for (const item of box) {
-        const data = {
-            title: item.querySelector(title).textContent.trim(),
-            start: item.querySelector(start).textContent.trim(),
-            address: item.querySelector(address).textContent.trim()
-        };
+    for (const item of list) {
+        let data = {
+                title: item.querySelector(title).textContent.trim(),
+                start: item.querySelector(start).textContent.trim()
+            },
+            _address_,
+            _banner_,
+            _link_;
 
-        const { dataset, src } = item.querySelector(banner);
+        if (address && (_address_ = item.querySelector(address)))
+            data.address = _address_.textContent.trim();
 
-        data.banner = src;
+        if (banner && (_banner_ = item.querySelector(banner))) {
+            const { dataset, src } = _banner_;
 
-        for (const key in dataset)
-            if (dataset[key].startsWith('http')) {
-                data.banner = dataset[key];
-                break;
-            }
+            data.banner = src;
 
-        data.link = new URL(item.querySelector(link).href);
+            for (const key in dataset)
+                if (dataset[key].startsWith('http')) {
+                    data.banner = dataset[key];
+                    break;
+                }
+        }
 
-        Array.from(data.link.searchParams.keys()).forEach(
-            key => key.startsWith('utm_') && data.link.searchParams.delete(key)
-        );
+        if (link && (_link_ = item.querySelector(link))) {
+            data.link = new URL(_link_.href);
+
+            Array.from(data.link.searchParams.keys()).forEach(
+                key =>
+                    key.startsWith('utm_') && data.link.searchParams.delete(key)
+            );
+        }
 
         if (tags)
             data.tags = Array.from(item.querySelectorAll(tags), item =>
@@ -80,6 +91,27 @@ export async function* event_list(
 
         yield data;
     }
+}
+
+/**
+ * @param {Object}                                   Old
+ * @param {Object}                                   New
+ * @param {function(Old: Object, New: Object): void} onUpdated
+ */
+export function updateEvent(Old, New, onUpdated) {
+    new Set(Object.keys(Old).concat(New)).forEach(key => {
+        if (['start', 'end'].includes(key)) {
+            if (new Date(Old[key]) < new Date(New[key])) {
+                Old[key] = New[key];
+
+                onUpdated(Old, New);
+            }
+        } else if ((Old[key] || '').length < (New[key] || '').length) {
+            Old[key] = New[key];
+
+            onUpdated(Old, New);
+        }
+    });
 }
 
 /**

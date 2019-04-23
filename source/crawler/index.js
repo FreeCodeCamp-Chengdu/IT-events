@@ -4,7 +4,7 @@ import { JSDOM } from 'jsdom';
 
 import fetch from 'node-fetch';
 
-import { event_list, makeDate } from './utility';
+import { eventList, makeDate } from '../utility';
 
 export async function* HuoDongXing(all) {
     for (let page = 1; ; page++) {
@@ -17,7 +17,7 @@ export async function* HuoDongXing(all) {
             })}`,
             empty = true;
 
-        for await (const item of event_list(
+        for await (const item of eventList(
             URL,
             '.search-tab-content-list .search-tab-content-item',
             '.item-title',
@@ -45,7 +45,7 @@ export async function* SegmentFault(all) {
             empty = true,
             now = new Date();
 
-        for await (const item of event_list(
+        for await (const item of eventList(
             URL,
             '.all-event-list .widget-event',
             '.title',
@@ -177,7 +177,7 @@ export async function* OSChina(all) {
             })).text(),
             empty = true;
 
-        for await (const item of event_list(
+        for await (const item of eventList(
             new JSDOM(data, { url: URL + '?' + body }),
             '.event-item',
             '.summary',

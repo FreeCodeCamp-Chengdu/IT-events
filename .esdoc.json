@@ -1,0 +1,31 @@
+{
+    "source": "./source",
+    "destination": "./docs",
+    "plugins": [
+        {
+            "name": "esdoc-standard-plugin",
+            "option": {
+                "test": {
+                    "source": "./test",
+                    "interfaces": ["describe", "it"],
+                    "includes": ["\\.spec\\.js$"]
+                },
+                "manual": {
+                    "files": ["./Contributing.md"]
+                }
+            }
+        },
+        {
+            "name": "esdoc-ecmascript-proposal-plugin",
+            "option": {
+                "all": true
+            }
+        },
+        {
+            "name": "esdoc-external-nodejs-plugin",
+            "option": {
+                "enable": true
+            }
+        }
+    ]
+}

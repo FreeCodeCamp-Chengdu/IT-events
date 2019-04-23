@@ -11,7 +11,7 @@
     ],
     "license": "MIT",
     "author": "shiy2008@gmail.com",
-    "homepage": "https://github.com/FreeCodeCamp-Chengdu/IT-events#readme",
+    "homepage": "https://fcc-cd.tk/IT-events/",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/FreeCodeCamp-Chengdu/IT-events.git"
@@ -30,7 +30,9 @@
         "format": "prettier --write \"{,!(node_modules|.git|dist|docs)/**/}*.{html,md,css,less,js,json,yml,yaml}\"",
         "lint": "eslint source/ --fix",
         "pack": "babel source/ -d dist/ -s",
-        "build": "npm run format  &&  npm run lint  &&  npm run pack"
+        "debug": "mocha --inspect-brk --no-timeouts",
+        "test": "mocha --exit",
+        "build": "npm run format  &&  npm test  &&  npm run lint  &&  npm run pack  &&  esdoc"
     },
     "husky": {
         "hooks": {
@@ -38,9 +40,9 @@
         }
     },
     "dependencies": {
-        "@babel/polyfill": "^7.2.5",
+        "@babel/polyfill": "^7.4.3",
         "@babel/runtime": "^7.4.3",
-        "jsdom": "^14.0.0",
+        "jsdom": "^15.0.0",
         "node-fetch": "^2.3.0",
         "string-similarity": "^3.0.0",
         "yaml": "^1.5.0"
@@ -49,10 +51,19 @@
         "@babel/cli": "^7.4.3",
         "@babel/core": "^7.4.3",
         "@babel/plugin-transform-runtime": "^7.4.3",
-        "@babel/preset-env": "^7.3.4",
-        "eslint": "^5.15.0",
+        "@babel/preset-env": "^7.4.3",
+        "@babel/register": "^7.4.0",
+        "esdoc": "^1.1.0",
+        "esdoc-ecmascript-proposal-plugin": "^1.0.0",
+        "esdoc-external-nodejs-plugin": "^1.0.0",
+        "esdoc-standard-plugin": "^1.0.0",
+        "eslint": "^5.16.0",
         "husky": "^1.3.1",
-        "prettier": "^1.16.4"
+        "mocha": "^6.1.4",
+        "prettier": "^1.17.0",
+        "should": "^13.2.3",
+        "should-sinon": "0.0.6",
+        "sinon": "^7.3.2"
     },
     "babel": {
         "presets": [

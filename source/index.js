@@ -1,6 +1,6 @@
 import * as crawler from './crawler';
 
-import { mergeStream } from './utility';
+import { mergeStream, updateEvent } from './utility';
 
 import { compareTwoStrings } from 'string-similarity';
 
@@ -44,22 +44,7 @@ export default async function(store = [], interval) {
             store.push(event);
 
             updated.push(event);
-        } else
-            new Set(Object.keys(item).concat(event)).forEach(key => {
-                if (['start', 'end'].includes(key)) {
-                    if (item[key] < event[key]) {
-                        item[key] = event[key];
-
-                        updated.push(item);
-                    }
-                } else if (
-                    (item[key] || '').length < (event[key] || '').length
-                ) {
-                    item[key] = event[key];
-
-                    updated.push(item);
-                }
-            });
+        } else updateEvent(item, event, Old => updated.push(Old));
     }
 
     return Array.from(new Set(updated));
