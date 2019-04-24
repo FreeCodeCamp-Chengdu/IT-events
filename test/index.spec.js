@@ -1,13 +1,6 @@
-import {
-    makeDate,
-    eventList,
-    mergeStream,
-    updateEvent
-} from '../source/utility';
+import { makeDate, eventList, mergeStream, diffEvent } from '../source/utility';
 
 import { JSDOM } from 'jsdom';
-
-import { spy } from 'sinon';
 
 const list = [];
 
@@ -70,26 +63,15 @@ describe('Utility methods', () => {
     });
 
     /**
-     * @test {updateEvent}
+     * @test {diffEvent}
      */
     it('updates Event item', () => {
-        const onUpdated = spy(),
-            New = {
-                title: 'NodeJS 网页爬虫一小时实战 - 水歌的 JS 工作坊',
-                start: '2019-04-14 20:10:00'
-            };
-
-        updateEvent(list[1], New, onUpdated);
-
-        onUpdated.should.be.calledWith(list[1], New);
-
-        list[1].should.be.eql({
+        const New = {
             title: 'NodeJS 网页爬虫一小时实战 - 水歌的 JS 工作坊',
-            start: '2019-04-14 20:10:00',
-            banner: 'https://fcc-cd.tk/images/thumbnail.svg'
-        });
+            start: '2019-04-14 20:10:00'
+        };
 
-        onUpdated.should.be.calledTwice();
+        diffEvent(list[1], New).should.be.eql(New);
     });
 
     /**

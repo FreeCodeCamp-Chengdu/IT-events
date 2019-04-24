@@ -29,7 +29,7 @@ export function makeDate(raw) {
  * @param {?String}      link    - CSS Selector of Event URL
  * @param {?String}      tags    - CSS Selector of Event tags
  *
- * @yield {Object} Event data
+ * @yield {Event} Event data
  */
 export async function* eventList(
     source,
@@ -94,24 +94,22 @@ export async function* eventList(
 }
 
 /**
- * @param {Object}                                   Old
- * @param {Object}                                   New
- * @param {function(Old: Object, New: Object): void} onUpdated
+ * @param {Event} Old
+ * @param {Event} New
+ *
+ * @return {Object} Diff data
  */
-export function updateEvent(Old, New, onUpdated) {
+export function diffEvent(Old, New) {
+    const diff = {};
+
     new Set(Object.keys(Old).concat(New)).forEach(key => {
         if (['start', 'end'].includes(key)) {
-            if (new Date(Old[key]) < new Date(New[key])) {
-                Old[key] = New[key];
-
-                onUpdated(Old, New);
-            }
-        } else if ((Old[key] || '').length < (New[key] || '').length) {
-            Old[key] = New[key];
-
-            onUpdated(Old, New);
-        }
+            if (new Date(Old[key]) < new Date(New[key])) diff[key] = New[key];
+        } else if ((Old[key] || '').length < (New[key] || '').length)
+            diff[key] = New[key];
     });
+
+    for (let key in diff) return diff;
 }
 
 /**
@@ -147,4 +145,14 @@ export async function* mergeStream(list, sorter, interval) {
 
         await delay(interval);
     }
+}
+
+/**
+ * @param {Object} A
+ * @param {Object} B
+ *
+ * @return {Number}
+ */
+export function descendDate(A, B) {
+    return B.start - A.start;
 }

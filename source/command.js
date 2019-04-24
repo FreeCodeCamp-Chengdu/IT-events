@@ -2,8 +2,18 @@
 
 import '@babel/polyfill';
 
+import updateEvents from './index';
+
+import { descendDate } from './utility';
+
 import { stringify } from 'yaml';
 
-import updateEvents, { descendDate } from './index';
+(async () => {
+    const list = [];
 
-updateEvents().then(list => console.info(stringify(list.sort(descendDate))));
+    for await (let item of updateEvents(list, process.argv[2])) list.push(item);
+
+    console.info(
+        stringify(Array.from(new Set(list).values()).sort(descendDate))
+    );
+})();

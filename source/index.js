@@ -1,34 +1,16 @@
-import * as crawler from './crawler';
+import { mergeStream, descendDate, diffEvent } from './utility';
 
-import { mergeStream, updateEvent } from './utility';
+import * as crawler from './crawler';
 
 import { compareTwoStrings } from 'string-similarity';
 
-export * from './utility';
-
-export * from './crawler';
-
 /**
- * @param {Object} A
- * @param {Object} B
+ * @param {Event[]} [store=[]]
+ * @param {?Number} interval
  *
- * @return {Number}
+ * @yield {Event}
  */
-export function descendDate(A, B) {
-    return B.start - A.start;
-}
-
-/**
- * @param {Object[]} [store=[]] - Fetched Events
- * @param {?Number}  interval   - Seconds
- *
- * @return {Object[]} Updated Events
- */
-export default async function(store = [], interval) {
-    store = store.filter(Boolean);
-
-    const updated = [];
-
+export default async function* updateEvents(store = [], interval) {
     for await (let event of mergeStream(
         Object.values(crawler).map(item => item()),
         descendDate,
@@ -40,12 +22,23 @@ export default async function(store = [], interval) {
                 compareTwoStrings(title, event.title) > 0.7
         );
 
-        if (!item) {
-            store.push(event);
-
-            updated.push(event);
-        } else updateEvent(item, event, Old => updated.push(Old));
+        if (!item) yield event;
+        else if ((event = diffEvent(item, event)))
+            yield Object.assign(item, event);
     }
-
-    return Array.from(new Set(updated));
 }
+
+export * from './utility';
+
+export * from './crawler';
+
+/**
+ * @typedef {Object} Event
+ *
+ * @property {String}   title
+ * @property {Date}     start
+ * @property {?String}  address
+ * @property {?URL}     banner
+ * @property {?URL}     link
+ * @property {String[]} tags
+ */

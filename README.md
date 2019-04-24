@@ -11,13 +11,14 @@
 ```shell
 npm install @fcc-cdc/it-events -g
 
-it-events 1> ~/Desktop/it-events.yml
+# 以间隔 0.5 秒的速度把所有活动下载到桌面的一个文件
+it-events 0.5 1> ~/Desktop/it-events.yml
 ```
 
 ### Node.JS 模块
 
 ```shell
-npm install @fcc-cdc/it-events
+npm install @fcc-cdc/it-events @babel/polyfill
 ```
 
 ```javascript
@@ -25,7 +26,13 @@ import '@babel/polyfill';
 
 import updateEvents, { descendDate } from '@fcc-cdc/it-events';
 
-updateEvents().then(list => console.info(list.sort(descendDate)));
+(async () => {
+    const list = [];
+
+    for await (let item of updateEvents(list, 0.5)) list.push(item);
+
+    console.log(Array.from(new Set(list).values()).sort(descendDate));
+})();
 ```
 
 [1]: https://github.com/too

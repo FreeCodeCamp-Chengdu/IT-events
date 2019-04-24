@@ -3,5 +3,5 @@
 test/
 .esdoc.json
 docs/
-.travis.yml
+*.yml
 .github
