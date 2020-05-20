@@ -13,10 +13,11 @@ install:
     - npm install
 script:
     - npm run build
-    - cd ${FOLDER}
-    - git init
-    - git config user.name ${UID}
-    - git config user.email ${EMAIL}
-    - git add .
-    - git commit -m "${MESSAGE}"
-    - git push --force --quiet https://${TOKEN}@${GIT_URI}.git master:gh-pages
+    - echo '' > docs/.nojekyll
+deploy:
+    provider: pages
+    on:
+        branch: master
+    skip_cleanup: true
+    local_dir: docs/
+    token: ${TOKEN}

@@ -1,44 +1,23 @@
 {
-    "env": {
-        "es6": true,
-        "node": true,
-        "browser": true,
-        "mocha": true
-    },
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "ecmaVersion": 9,
-        "sourceType": "module"
+        "project": ["./tsconfig.json", "./test/tsconfig.json"]
     },
-    "extends": "eslint:recommended",
+    "plugins": ["@typescript-eslint"],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking"
+    ],
     "rules": {
-        "indent": [
-            "error",
-            4,
-            {
-                "SwitchCase": 1
-            }
-        ],
-        "linebreak-style": ["error", "unix"],
-        "quotes": ["error", "single"],
-        "semi": ["error", "always"],
-        "no-cond-assign": "off",
-        "getter-return": "warn",
-        "no-console": [
-            "error",
-            {
-                "allow": ["info", "warn", "error", "time", "timeEnd"]
-            }
-        ],
-        "valid-jsdoc": [
-            "error",
-            {
-                "prefer": {
-                    "returns": "return"
-                },
-                "requireParamDescription": false,
-                "requireReturn": false,
-                "requireReturnDescription": false
-            }
-        ]
+        "no-var": "warn",
+        "prefer-const": "warn",
+        "no-ex-assign": "warn",
+        "require-atomic-updates": "warn",
+        "@typescript-eslint/camelcase": "warn",
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/no-misused-promises": "off",
+        "@typescript-eslint/ban-ts-ignore": "warn"
     }
 }

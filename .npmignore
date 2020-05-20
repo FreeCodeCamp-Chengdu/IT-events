@@ -1,7 +1,6 @@
 .editorconfig
 .eslintrc.json
 test/
-.esdoc.json
 docs/
 *.yml
 .github

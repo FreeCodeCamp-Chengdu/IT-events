@@ -1,16 +1,12 @@
-import { mergeStream, descendDate, diffEvent } from './utility';
-
-import * as crawler from './crawler';
-
 import { compareTwoStrings } from 'string-similarity';
 
-/**
- * @param {Event[]} [store=[]]
- * @param {?Number} interval
- *
- * @yield {Event}
- */
-export default async function* updateEvents(store = [], interval) {
+import { Event, mergeStream, descendDate, diffEvent } from './utility';
+import * as crawler from './crawler';
+
+export default async function* updateEvents(
+    store: Event[] = [],
+    interval?: number
+) {
     for await (let event of mergeStream(
         Object.values(crawler).map(item => item()),
         descendDate,
@@ -29,16 +25,4 @@ export default async function* updateEvents(store = [], interval) {
 }
 
 export * from './utility';
-
 export * from './crawler';
-
-/**
- * @typedef {Object} Event
- *
- * @property {String}   title
- * @property {Date}     start
- * @property {?String}  address
- * @property {?URL}     banner
- * @property {?URL}     link
- * @property {String[]} tags
- */

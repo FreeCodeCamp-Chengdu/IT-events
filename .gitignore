@@ -1,4 +1,5 @@
 # Node.JS
+package-lock.json
 node_modules/
 
 # Building
@@ -8,9 +9,6 @@ docs/
 # IDE
 .vscode/
 .idea/
-
-# Online platform
-.github/
 
 # OS
 .DS_Store

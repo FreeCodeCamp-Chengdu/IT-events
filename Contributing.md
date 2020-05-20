@@ -37,5 +37,7 @@ google 的日历可以共享出来，大家都可以往上面添加和完善活�
 
 ## 注意事项
 
--   现有的 FCC 成都社区官网上有活动栏目[活动时空 - FCC 成都社区](https://fcc-cd.tk/activity/)展示社区的活动安排和过往活动，如何整合？
--   微软 Office 365 日历也可以对外共享https://sg.godaddy.com/zh/help/office-365outlook-24688
+-   现有的 FCC 成都社区官网上有活动栏目[活动时空 - FCC 成都社区][1]展示社区的活动安排和过往活动，如何整合？
+-   微软 Office 365 日历也可以对外共享 https://sg.godaddy.com/zh/help/office-365outlook-24688
+
+[1]: https://fcc-cd.dev/activity/
