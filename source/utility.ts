@@ -1,4 +1,7 @@
+import 'array-unique-proposal';
+import { outputFile } from 'fs-extra';
 import { JSDOM } from 'jsdom';
+import { join } from 'path';
 import { URL } from 'url';
 import { promisify } from 'util';
 
@@ -15,8 +18,11 @@ export const logTime = <This, Args extends any[], Return>(
         console.time(title);
 
         const output = target.apply(this, input),
-            end = () => console.timeEnd(title);
-
+            end = () => {
+                console.log();
+                console.timeEnd(title);
+                console.log();
+            };
         if (output instanceof Promise) output.finally(end);
         else end();
 
@@ -33,6 +39,40 @@ export function makeDate(raw: string) {
     );
 
     if (!isNaN(+date)) return date;
+}
+
+export function stringifyCSV(list: Record<string, any>[]) {
+    const header: string[] = [];
+
+    const body = list.map(item => {
+        const row = [];
+
+        for (const [key, value] of Object.entries(item)) {
+            let index = header.indexOf(key);
+
+            if (index === -1) index += header.push(key);
+
+            row[index] = value;
+        }
+        return row;
+    });
+
+    return [header, ...body]
+        .map(row => row.map(value => JSON.stringify(value)).join(','))
+        .join('\n');
+}
+
+export async function saveFile(
+    data: string | NodeJS.ArrayBufferView,
+    ...pathParts: string[]
+) {
+    const path = join(...pathParts);
+
+    await outputFile(path, data);
+
+    console.log(`[save] ${path}`);
+
+    return path;
 }
 
 export interface Event {

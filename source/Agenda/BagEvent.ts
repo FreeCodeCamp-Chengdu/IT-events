@@ -13,7 +13,7 @@ export class BagEventAgenda extends AgendaCrawler {
         } = await JSDOM.fromURL(URI);
 
         this.forums = [...document.querySelectorAll('.s_li_fhc')].map(item => ({
-            title: textFrom(item, '.s_li_ti .theme'),
+            name: textFrom(item, '.s_li_ti .theme'),
             summary: textFrom(item, '.s_li_ti .intro'),
             during: this.getDuring(item.querySelector('.s_li_ti .time'))
         }));
@@ -24,7 +24,7 @@ export class BagEventAgenda extends AgendaCrawler {
                 '.s_li_ti .theme'
             );
             yield {
-                forum: this.forums.find(({ title }) => title === forum),
+                forum: this.forums.find(({ name }) => name === forum),
                 ...(await this.getItemFrom(item))
             };
         }
