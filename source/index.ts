@@ -3,8 +3,8 @@ import { compareTwoStrings } from 'string-similarity';
 import { Event, mergeStream, descendDate, diffEvent } from './utility';
 import * as crawler from './crawler';
 
-export default async function* updateEvents(
-    store: Event[] = [],
+export default async function* updateEvents<T extends Event>(
+    store: T[] = [],
     interval?: number
 ) {
     for await (let event of mergeStream(
@@ -18,11 +18,13 @@ export default async function* updateEvents(
                 compareTwoStrings(title, event.title) > 0.7
         );
 
-        if (!item) yield event;
+        if (!item) yield event as T;
         else if ((event = diffEvent(item, event)))
             yield Object.assign(item, event);
     }
 }
 
 export * from './utility';
+export * from './core/Crawler';
+export * from './Agenda';
 export * from './crawler';

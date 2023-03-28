@@ -5,8 +5,9 @@ import { stringify } from 'yaml';
 
 import updateEvents from './index';
 import { Event, descendDate } from './utility';
+import * as Agenda from './Agenda';
 
-async function fetch({ interval }: { interval: number }) {
+async function fetchEvents({ interval }: { interval: number }) {
     const list: Event[] = [];
 
     for await (const item of updateEvents(list, interval)) list.push(item);
@@ -16,18 +17,31 @@ async function fetch({ interval }: { interval: number }) {
     process.exit();
 }
 
+function fetchAgendas(_, URI: string) {
+    const [vendor] = new URL(URI).hostname.split('.').slice(-2);
+
+    const Crawler = Object.entries(Agenda).find(([name]) =>
+        name.toLowerCase().match(vendor.toLowerCase())
+    )?.[1] as new (...data: any[]) => Agenda.BagEventAgenda;
+
+    return new Crawler().saveList(URI);
+}
+
 Command.execute(
-    <it-events
-        version="0.6.0"
-        options={{
-            interval: {
-                shortcut: 'i',
-                parameters: '<number>',
-                pattern: /^[\d.]+$/,
-                description: 'Seconds interval while fetching'
-            }
-        }}
-        executor={fetch}
-    />,
+    <Command name="it-events" version="1.2.0">
+        <Command
+            name="list"
+            options={{
+                interval: {
+                    shortcut: 'i',
+                    parameters: '<number>',
+                    pattern: /^[\d.]+$/,
+                    description: 'Seconds interval while fetching'
+                }
+            }}
+            executor={fetchEvents}
+        />
+        <Command name="agenda" executor={fetchAgendas} />
+    </Command>,
     process.argv.slice(2)
 );

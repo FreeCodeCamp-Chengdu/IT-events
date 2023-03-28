@@ -6,18 +6,15 @@
     "plugins": ["@typescript-eslint"],
     "extends": [
         "eslint:recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended",
-        "plugin:@typescript-eslint/recommended-requiring-type-checking"
+        "prettier"
     ],
     "rules": {
         "no-var": "warn",
         "prefer-const": "warn",
         "no-ex-assign": "warn",
         "require-atomic-updates": "warn",
-        "@typescript-eslint/camelcase": "warn",
         "@typescript-eslint/explicit-function-return-type": "off",
-        "@typescript-eslint/no-misused-promises": "off",
-        "@typescript-eslint/ban-ts-ignore": "warn"
+        "@typescript-eslint/no-misused-promises": "off"
     }
 }

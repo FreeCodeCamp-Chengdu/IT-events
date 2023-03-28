@@ -1,6 +1,8 @@
 .editorconfig
 .eslintrc.json
+temp/
 test/
 docs/
 *.yml
-.github
+.husky/
+.github/

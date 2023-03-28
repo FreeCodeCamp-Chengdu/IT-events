@@ -1,5 +1,6 @@
 # Node.JS
 package-lock.json
+yarn.lock
 node_modules/
 
 # Building
@@ -15,3 +16,4 @@ docs/
 
 # Project test
 test.yml
+temp/
