@@ -1,6 +1,6 @@
 {
     "name": "@fcc-cdc/it-events",
-    "version": "1.2.0-rc.0",
+    "version": "1.2.0-rc.1",
     "description": "IT Events Crawler of China",
     "keywords": [
         "crawler",
@@ -38,7 +38,9 @@
         "prepublishOnly": "npm test  &&  npm run build"
     },
     "dependencies": {
+        "array-unique-proposal": "^0.3.4",
         "commander-jsx": "^0.6.1",
+        "file-type": "^16.5.4",
         "fs-extra": "^11.1.1",
         "jsdom": "^21.1.1",
         "node-fetch": "^2.6.9",
@@ -50,6 +52,7 @@
         "@types/fs-extra": "^11.0.1",
         "@types/jest": "^29.5.0",
         "@types/jsdom": "^21.1.1",
+        "@types/node": "^16.18.21",
         "@types/node-fetch": "^2.6.2",
         "@types/string-similarity": "^4.0.0",
         "@typescript-eslint/eslint-plugin": "^5.57.0",

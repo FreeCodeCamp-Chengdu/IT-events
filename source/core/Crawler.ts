@@ -1,8 +1,7 @@
-import { outputFile } from 'fs-extra';
 import { join } from 'path';
 import { stringify } from 'yaml';
 
-import { logTime } from '../utility';
+import { logTime, saveFile } from '../utility';
 
 export const textOf = (node?: Element | null) => node?.textContent?.trim();
 
@@ -14,22 +13,22 @@ export abstract class DataCrawler<T> {
 
     abstract getItem(URI: string): Promise<T>;
 
-    makeFile(list: T[]) {
+    makeYAML(list: T[]) {
         return stringify(list);
     }
 
     @logTime
-    async saveList(URI = '') {
+    async saveList(URI: string) {
         const list: T[] = [],
-            file = join(process.cwd(), 'temp', `${new URL(URI).pathname}.yml`);
+            folder = join(process.cwd(), 'temp', new URL(URI).pathname);
 
         for await (const item of this.getList(URI)) {
             console.log(item);
 
             list.push(item);
         }
-        await outputFile(file, this.makeFile(list));
+        const file = await saveFile(this.makeYAML(list), folder, 'index.yml');
 
-        console.log(`[save] ${file}\n`);
+        return { list, folder, file };
     }
 }
