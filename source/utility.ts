@@ -1,5 +1,27 @@
 import { JSDOM } from 'jsdom';
 import { URL } from 'url';
+import { promisify } from 'util';
+
+export const logTime = <This, Args extends any[], Return>(
+    target: (this: This, ...args: Args) => Return,
+    context: ClassMethodDecoratorContext<
+        This,
+        (this: This, ...args: Args) => Return
+    >
+) =>
+    function (...input: Args) {
+        const title = context.name.toString();
+
+        console.time(title);
+
+        const output = target.apply(this, input),
+            end = () => console.timeEnd(title);
+
+        if (output instanceof Promise) output.finally(end);
+        else end();
+
+        return output;
+    };
 
 export function makeDate(raw: string) {
     const date = new Date(
@@ -103,9 +125,7 @@ export function diffEvent(Old: Event, New: Event) {
     for (const key in diff) return diff;
 }
 
-export function delay(seconds = 0.25) {
-    return new Promise(resolve => setTimeout(resolve, seconds * 1000));
-}
+export const delay = promisify(setTimeout);
 
 /**
  * @param list
@@ -133,7 +153,7 @@ export async function* mergeStream<T>(
 
         yield top;
 
-        await delay(interval);
+        await delay(interval * 1000);
     }
 }
 

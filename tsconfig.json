@@ -2,20 +2,20 @@
     "compilerOptions": {
         "outDir": "dist/",
         "declaration": true,
-        "target": "ES2018",
+        "target": "ES2017",
         "module": "CommonJS",
         "moduleResolution": "Node",
         "esModuleInterop": true,
+        "downlevelIteration": true,
         "jsx": "react",
         "jsxFactory": "createCommand",
-        "lib": ["ES2019", "DOM", "DOM.Iterable"]
+        "lib": ["ES2022", "DOM", "DOM.Iterable"]
     },
     "include": ["source/*"],
     "typedocOptions": {
         "name": "IT Events crawler",
-        "mode": "file",
         "excludeExternals": true,
-        "excludeNotExported": true,
+        "excludePrivate": true,
         "readme": "./README.md",
         "out": "docs/"
     }
