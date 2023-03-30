@@ -9,15 +9,12 @@ import { logTime, saveFile, stringifyCSV } from '../utility';
 export type Mentor = Partial<
     Record<'name' | 'avatar' | 'position' | 'summary', string>
 >;
-export type During = Record<'date' | 'startTime' | 'endTime', string>;
+export type Duration = Partial<Record<'startTime' | 'endTime', string>>;
 
-export interface Forum extends Pick<Mentor, 'name' | 'summary'> {
-    during: During;
-}
+export type Forum = Duration & Pick<Mentor, 'name' | 'summary'>;
 
-export interface Agenda {
+export interface Agenda extends Duration {
     title?: string;
-    during?: During;
     mentor?: Mentor;
     forum?: Forum;
 }
@@ -43,15 +40,11 @@ export abstract class AgendaCrawler<
 
         return {
             mentors,
-            forums: forums.map(({ during, ...forum }) => ({
-                ...forum,
-                ...during
-            })),
-            agendas: agendas.map(({ during, mentor, forum, ...agenda }) => ({
+            forums,
+            agendas: agendas.map(({ mentor, forum, ...agenda }) => ({
                 ...agenda,
-                ...during,
-                mentor: mentor.name,
-                forum: forum.name
+                mentor: mentor?.name,
+                forum: forum?.name
             }))
         };
     }

@@ -18,19 +18,26 @@ async function fetchEvents({ interval }: { interval: number }) {
 }
 
 function fetchAgendas(_, URI: string) {
-    const [vendor] = new URL(URI).hostname.split('.').slice(-2);
+    const Crawler = Object.values(Agenda).find(
+        Class => Class instanceof Function && Class.schema?.exec(URI)
+    ) as new (...data: any[]) => Agenda.BagEventAgenda;
 
-    const Crawler = Object.entries(Agenda).find(([name]) =>
-        name.toLowerCase().match(vendor.toLowerCase())
-    )?.[1] as new (...data: any[]) => Agenda.BagEventAgenda;
+    if (!Crawler) throw new URIError(`${URI} doesn't match any URL schema`);
 
     return new Crawler().saveList(URI);
 }
 
 Command.execute(
-    <Command name="it-events" version="1.2.0">
+    <Command
+        name="it-events"
+        version="1.2.0"
+        parameters="<command> [options]"
+        description="China IT events crawler, made by https://fcc-cd.dev/"
+    >
         <Command
             name="list"
+            parameters="[options]"
+            description="fetch Event list"
             options={{
                 interval: {
                     shortcut: 'i',
@@ -41,7 +48,12 @@ Command.execute(
             }}
             executor={fetchEvents}
         />
-        <Command name="agenda" executor={fetchAgendas} />
+        <Command
+            name="agenda"
+            parameters="<URL>"
+            description="fetch Agenda data & assets of an Event"
+            executor={fetchAgendas}
+        />
     </Command>,
     process.argv.slice(2)
 );

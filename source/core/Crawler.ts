@@ -9,6 +9,11 @@ export const textFrom = (root: ParentNode | null, selector: string) =>
     textOf(root?.querySelector(selector));
 
 export abstract class DataCrawler<T> {
+    declare ['constructor']: typeof DataCrawler;
+
+    static baseURI = '';
+    static schema: URLPattern;
+
     abstract getList(URI: string): AsyncGenerator<T>;
 
     abstract getItem(URI: string): Promise<T>;

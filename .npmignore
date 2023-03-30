@@ -6,3 +6,5 @@ docs/
 *.yml
 .husky/
 .github/
+.vscode/
+.idea/

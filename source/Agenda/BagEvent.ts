@@ -5,7 +5,11 @@ import { textFrom, textOf } from '../core/Crawler';
 import { AgendaCrawler } from './core';
 
 export class BagEventAgenda extends AgendaCrawler {
-    baseURI = 'https://www.bagevent.com/event';
+    static baseURI = 'https://www.bagevent.com/event';
+
+    static schema = new URLPattern(
+        `${this.baseURI}/:event(\\d+){/p/:page(\\d+)}?`
+    );
 
     override async *getList(URI: string) {
         const {
@@ -15,10 +19,12 @@ export class BagEventAgenda extends AgendaCrawler {
         this.forums = [...document.querySelectorAll('.s_li_fhc')].map(item => ({
             name: textFrom(item, '.s_li_ti .theme'),
             summary: textFrom(item, '.s_li_ti .intro'),
-            during: this.getDuring(item.querySelector('.s_li_ti .time'))
+            ...this.getDuration(item.querySelector('.s_li_ti .time'))
         }));
 
-        for (const item of document.querySelectorAll<HTMLElement>('.gu_1')) {
+        for (const item of document.querySelectorAll<HTMLElement>(
+            '.li > .box.clearfix'
+        )) {
             const forum = textFrom(
                 item.closest('.s_li_fhc'),
                 '.s_li_ti .theme'
@@ -30,26 +36,26 @@ export class BagEventAgenda extends AgendaCrawler {
         }
     }
 
-    getDuring(box: HTMLElement | null) {
+    getDuration(box: HTMLElement | null) {
         if (!box) return;
 
         const [date, startTime, _, endTime] = box.children;
 
+        const dateText = textOf(date);
+
         return {
-            date: textOf(date),
-            startTime: textOf(startTime),
-            endTime: textOf(endTime)
+            startTime: `${dateText} ${textOf(startTime)}`,
+            endTime: `${dateText} ${textOf(endTime)}`
         };
     }
 
     async getItemFrom(box: HTMLElement) {
+        const { baseURI, schema } = this.constructor;
         const {
             pathname: {
                 groups: { event }
             }
-        } = new URLPattern(
-            `${this.baseURI}/:event(\\d+){/p/:page(\\d+)}?`
-        ).exec(box.baseURI);
+        } = schema.exec(box.baseURI);
 
         const ID = box
             .querySelector('.theme')
@@ -58,7 +64,7 @@ export class BagEventAgenda extends AgendaCrawler {
 
         if (!ID) return;
 
-        const detail = await this.getItem(`${this.baseURI}/${event}?aId=${ID}`),
+        const detail = await this.getItem(`${baseURI}/${event}?aId=${ID}`),
             name = textFrom(box, '.g_na');
 
         let mentor = this.mentors.find(({ name: n }) => n === name);
@@ -77,7 +83,7 @@ export class BagEventAgenda extends AgendaCrawler {
 
         return {
             ...detail,
-            during: this.getDuring(box.querySelector('.time')),
+            ...this.getDuration(box.querySelector('.time')),
             mentor
         };
     }
