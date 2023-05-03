@@ -75,6 +75,40 @@ export async function saveFile(
     return path;
 }
 
+export function getCSSSelector(
+    toElement: Element,
+    fromElement = toElement.getRootNode()
+) {
+    const selectors: string[] = [];
+
+    do {
+        const { tagName, className, parentNode } = toElement;
+
+        const selector =
+            tagName.toLowerCase() +
+            (className.trim()
+                ? '.' + className.split(/\s+/).filter(Boolean).join('.')
+                : `:nth-child(${
+                      [...parentNode.children].indexOf(toElement) + 1
+                  })`);
+        selectors.unshift(selector);
+
+        toElement = parentNode as Element;
+    } while (fromElement ? fromElement !== toElement : toElement);
+
+    return selectors.join(' > ');
+}
+
+export function sameParentOf(first: Element, second: Element) {
+    do {
+        const { parentNode } = first;
+
+        if (parentNode.contains(second)) return parentNode;
+
+        first = parentNode as Element;
+    } while (first);
+}
+
 export interface Event {
     title: string;
     start: Date;
