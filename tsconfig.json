@@ -11,12 +11,12 @@
         "jsxFactory": "createCommand",
         "lib": ["ES2022", "DOM", "DOM.Iterable"]
     },
-    "include": ["source/*"],
+    "include": ["source/**/*"],
     "typedocOptions": {
         "name": "IT Events crawler",
         "excludeExternals": true,
         "excludePrivate": true,
         "readme": "./README.md",
-        "out": "docs/"
+        "plugin": ["typedoc-plugin-mdn-links"]
     }
 }
