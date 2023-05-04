@@ -5,3 +5,9 @@ export class HuoDongXingAgenda extends CommonAgendaCrawler {
 
     static schema = new URLPattern(`${this.baseURI}/:event(\\d+)`);
 }
+
+export class OldHuoDongXingAgenda extends CommonAgendaCrawler {
+    static baseURI = 'https://www.huodongxing.com/go';
+
+    static schema = new URLPattern(`${this.baseURI}/:event(\\w+)`);
+}

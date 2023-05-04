@@ -75,9 +75,16 @@ export async function saveFile(
     return path;
 }
 
+export enum CSSSelectorPrecision {
+    Low,
+    Medium,
+    High
+}
+
 export function getCSSSelector(
     toElement: Element,
-    fromElement = toElement.getRootNode()
+    fromElement = toElement.getRootNode(),
+    precision = CSSSelectorPrecision.Low
 ) {
     const selectors: string[] = [];
 
@@ -88,9 +95,12 @@ export function getCSSSelector(
             tagName.toLowerCase() +
             (className.trim()
                 ? '.' + className.split(/\s+/).filter(Boolean).join('.')
-                : `:nth-child(${
+                : precision === CSSSelectorPrecision.High ||
+                  (precision === CSSSelectorPrecision.Medium && !selectors[0])
+                ? `:nth-child(${
                       [...parentNode.children].indexOf(toElement) + 1
-                  })`);
+                  })`
+                : '');
         selectors.unshift(selector);
 
         toElement = parentNode as Element;

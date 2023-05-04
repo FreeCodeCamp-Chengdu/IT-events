@@ -1,6 +1,6 @@
 {
     "name": "@fcc-cdc/it-events",
-    "version": "1.3.0-alpha.0",
+    "version": "1.3.0",
     "license": "MIT",
     "author": "shiy2008@gmail.com",
     "description": "IT Events Crawler of China",

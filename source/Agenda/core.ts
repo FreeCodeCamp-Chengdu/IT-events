@@ -13,7 +13,7 @@ export type Duration = Partial<Record<'startTime' | 'endTime', string>>;
 
 export type Forum = Duration & Pick<Mentor, 'name' | 'summary'>;
 
-export interface Agenda extends Duration {
+export interface Agenda extends Duration, Pick<Forum, 'summary'> {
     title?: string;
     mentor?: Mentor;
     forum?: Forum;
